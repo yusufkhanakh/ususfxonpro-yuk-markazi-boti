@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>YusufxonPro Premium</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f2f2f7;
+            --border: #e5e5ea;
+            --text: #000000;
+            --accent: #007aff;
+            --danger: #ff3b30;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
+
+        /* --- Minimalist Loading --- */
+        #loader {
+            position: fixed; inset: 0; background: #fff; z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: 0.5s ease-out;
+        }
+        .logo-big { width: 220px; animation: breathe 3s infinite ease-in-out; }
+        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
+
+        /* --- UI Elements --- */
+        .glass-header {
+            padding: 20px 24px; position: sticky; top: 0; background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; z-index: 100;
+        }
+
+        .cargo-card {
+            background: #fff; border: 1px solid var(--border); border-radius: 24px;
+            padding: 20px; margin: 15px 20px; transition: transform 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .cargo-card:active { transform: scale(0.98); }
+
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .active-dot { background: #34c759; box-shadow: 0 0 10px #34c759; }
+
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn {
+            flex: 1; padding: 12px; border: none; border-radius: 12px;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+        .btn-black { background: #000; color: #fff; }
+        .btn-outline { background: var(--surface); color: #000; }
+        .btn-red { background: #fff0f0; color: var(--danger); }
+
+        /* --- FAB --- */
+        .fab {
+            position: fixed; bottom: 30px; right: 24px; width: 64px; height: 64px;
+            background: #000; color: #fff; border-radius: 50%; border: none;
+            font-size: 30px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 50;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <img src="https://i.postimg.cc/d1X5vYfK/M-LOGOG.png" class="logo-big">
+    </div>
+
+    <header class="glass-header">
+        <img src="https://i.postimg.cc/d1X5vYfK/M-LOGOG.png" style="width: 40px;">
+        <div id="u-initials" style="width: 38px; height: 38px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">Y</div>
+    </header>
+
+    <div id="cargo-container" style="padding-top: 10px;">
+        </div>
+
+    <button class="fab" onclick="tg.HapticFeedback.impactOccurred('heavy'); openModal();">+</button>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.backgroundColor = "#ffffff";
+
+        // Loadingni o'chirish
+        setTimeout(() => document.getElementById('loader').style.opacity = '0', 2500);
+        setTimeout(() => document.getElementById('loader').style.display = 'none', 3000);
+
+        // Yuklar bazasi (localStorage)
+        let cargos = JSON.parse(localStorage.getItem('yusufxon_pro_cargos') || '[]');
+
+        function render() {
+            const container = document.getElementById('cargo-container');
+            container.innerHTML = cargos.map((c, i) => `
+                <div class="cargo-card">
+                    <div style="font-size: 12px; color: #8e8e93; margin-bottom: 8px;">
+                        <span class="status-dot ${c.active ? 'active-dot' : ''}"></span>
+                        ${c.active ? 'FAOL 24/7' : 'TO\'XTATILGAN'}
+                    </div>
+                    <div style="font-size: 17px; font-weight: 500;">${c.text}</div>
+                    <div style="font-size: 12px; margin-top: 5px; color: #8e8e93;">Interval: ${c.interval}s | Soni: ${c.count}</div>
+                    
+                    <div class="btn-group">
+                        <button class="btn ${c.active ? 'btn-outline' : 'btn-black'}" onclick="toggleStatus(${i})">
+                            ${c.active ? 'HIDE (TO\'XTATISH)' : 'SHOW (YOQISH)'}
+                        </button>
+                        <button class="btn btn-red" onclick="removeCargo(${i})">DELETE</button>
+                    </div>
+                </div>
+            `).join('');
+            localStorage.setItem('yusufxon_pro_cargos', JSON.stringify(cargos));
+        }
+
+        function toggleStatus(i) {
+            tg.HapticFeedback.notificationOccurred('success');
+            cargos[i].active = !cargos[i].active;
+            render();
+        }
+
+        function removeCargo(i) {
+            tg.HapticFeedback.notificationOccurred('warning');
+            if(confirm("Haqiqatdan ham kanaldan o'chirmoqchimisiz?")) {
+                cargos.splice(i, 1);
+                render();
+            }
+        }
+
+        // Yuk qo'shish funksiyasi
+        function openModal() {
+            const txt = prompt("Yuk tavsifini yozing:");
+            if(txt) {
+                cargos.unshift({
+                    text: txt,
+                    active: true,
+                    interval: 4,
+                    count: '24/7'
+                });
+                render();
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>
