@@ -3,143 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>YusufxonPro Premium</title>
+    <title>YusufxonPro Logistics</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
             --bg: #ffffff;
-            --surface: #f2f2f7;
-            --border: #e5e5ea;
+            --input-bg: #f2f2f7;
             --text: #000000;
+            --sub: #8e8e93;
             --accent: #007aff;
-            --danger: #ff3b30;
+            --border: #e5e5ea;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); -webkit-user-select: none; }
 
-        /* --- Minimalist Loading --- */
+        /* 1. Katta Loading */
         #loader {
-            position: fixed; inset: 0; background: #fff; z-index: 9999;
-            display: flex; justify-content: center; align-items: center;
-            transition: 0.5s ease-out;
+            position: fixed; inset: 0; background: #fff; z-index: 1000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .logo-big { width: 220px; animation: breathe 3s infinite ease-in-out; }
-        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
+        .logo-luxe { width: 250px; animation: pulse 2.5s infinite ease-in-out; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.05); opacity: 1; } }
 
-        /* --- UI Elements --- */
-        .glass-header {
-            padding: 20px 24px; position: sticky; top: 0; background: rgba(255,255,255,0.8);
-            backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center; z-index: 100;
+        /* 2. Login Page */
+        #login-page { padding: 40px 25px; display: none; height: 100vh; flex-direction: column; }
+        .title { font-size: 32px; font-weight: 800; margin-bottom: 30px; letter-spacing: -1px; }
+        
+        .field { margin-bottom: 20px; }
+        .field label { display: block; font-size: 13px; font-weight: 600; color: var(--sub); margin-bottom: 8px; text-transform: uppercase; }
+        input {
+            width: 100%; padding: 18px; background: var(--input-bg); border: 1px solid var(--border);
+            border-radius: 16px; font-size: 17px; outline: none; transition: 0.3s;
         }
+        input:focus { border-color: var(--text); background: #fff; }
 
-        .cargo-card {
-            background: #fff; border: 1px solid var(--border); border-radius: 24px;
-            padding: 20px; margin: 15px 20px; transition: transform 0.2s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        /* 3. Main Dashboard */
+        #main-app { display: none; padding-bottom: 100px; }
+        header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 45px; height: 45px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+        .cargo-list { padding: 20px; }
+        .cargo-card { 
+            background: #fff; border: 1px solid var(--border); border-radius: 24px; padding: 20px; margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
         }
-        .cargo-card:active { transform: scale(0.98); }
+        .status { font-size: 11px; font-weight: 700; color: #34c759; margin-bottom: 8px; display: block; }
+        
+        .card-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-sm { flex: 1; padding: 12px; border-radius: 12px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .btn-hide { background: var(--input-bg); color: #000; }
+        .btn-del { background: #fff0f0; color: #ff3b30; }
 
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .active-dot { background: #34c759; box-shadow: 0 0 10px #34c759; }
-
-        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
-        .btn {
-            flex: 1; padding: 12px; border: none; border-radius: 12px;
-            font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s;
-        }
-        .btn-black { background: #000; color: #fff; }
-        .btn-outline { background: var(--surface); color: #000; }
-        .btn-red { background: #fff0f0; color: var(--danger); }
-
-        /* --- FAB --- */
+        /* FAB (Plus) */
         .fab {
-            position: fixed; bottom: 30px; right: 24px; width: 64px; height: 64px;
-            background: #000; color: #fff; border-radius: 50%; border: none;
-            font-size: 30px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 50;
+            position: fixed; bottom: 35px; right: 25px; width: 65px; height: 65px;
+            background: #000; color: #fff; border-radius: 50%; font-size: 35px;
+            border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <img src="https://i.postimg.cc/d1X5vYfK/M-LOGOG.png" class="logo-big">
+        <img src="https://i.postimg.cc/d1X5vYfK/M-LOGOG.png" class="logo-luxe">
+        <p style="margin-top: 20px; font-weight: 600; letter-spacing: 3px; font-size: 12px;">LOADING PREMIER</p>
     </div>
 
-    <header class="glass-header">
-        <img src="https://i.postimg.cc/d1X5vYfK/M-LOGOG.png" style="width: 40px;">
-        <div id="u-initials" style="width: 38px; height: 38px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">Y</div>
-    </header>
-
-    <div id="cargo-container" style="padding-top: 10px;">
+    <div id="login-page">
+        <h1 class="title">Ro'yxatdan o'tish</h1>
+        <div class="field">
+            <label>Ism</label>
+            <input type="text" id="in-name" placeholder="Masalan: Yusufxon">
         </div>
+        <div class="field">
+            <label>Familiya</label>
+            <input type="text" id="in-surname" placeholder="Masalan: Axmatov">
+        </div>
+        <div class="field">
+            <label>Telefon</label>
+            <input type="tel" id="in-phone" placeholder="+998 90-123-45-67">
+        </div>
+        <button onclick="saveLogin()" style="width: 100%; padding: 20px; background: #000; color: #fff; border: none; border-radius: 18px; font-weight: 700; font-size: 17px; margin-top: 20px;">ILOVAGA KIRISH</button>
+    </div>
 
-    <button class="fab" onclick="tg.HapticFeedback.impactOccurred('heavy'); openModal();">+</button>
+    <div id="main-app">
+        <header>
+            <div class="user-info">
+                <div class="avatar" id="avatar">Y</div>
+                <div>
+                    <h4 id="user-name-display" style="font-size: 16px;">Yusufxon Axmatov</h4>
+                    <p style="font-size: 12px; color: var(--sub);">Admin Rejim</p>
+                </div>
+            </div>
+            <img src="https://i.postimg.cc/d1X5vYfK/M-LOGOG.png" style="width: 35px;">
+        </header>
+
+        <div class="cargo-list" id="list">
+            </div>
+
+        <button class="fab" onclick="addCargo()">+</button>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.backgroundColor = "#ffffff";
 
-        // Loadingni o'chirish
-        setTimeout(() => document.getElementById('loader').style.opacity = '0', 2500);
-        setTimeout(() => document.getElementById('loader').style.display = 'none', 3000);
+        // 1. Loading sequence
+        setTimeout(() => {
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                checkAuth();
+            }, 800);
+        }, 3000);
 
-        // Yuklar bazasi (localStorage)
-        let cargos = JSON.parse(localStorage.getItem('yusufxon_pro_cargos') || '[]');
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('user_data'));
+            if (user) {
+                showApp(user);
+            } else {
+                document.getElementById('login-page').style.display = 'flex';
+            }
+        }
 
-        function render() {
-            const container = document.getElementById('cargo-container');
-            container.innerHTML = cargos.map((c, i) => `
+        function saveLogin() {
+            const name = document.getElementById('in-name').value;
+            const surname = document.getElementById('in-surname').value;
+            const phone = document.getElementById('in-phone').value;
+
+            if (name && surname && phone) {
+                const user = { name, surname, phone };
+                localStorage.setItem('user_data', JSON.stringify(user));
+                tg.HapticFeedback.notificationOccurred('success');
+                showApp(user);
+            } else {
+                tg.showAlert("Iltimos, barcha maydonlarni to'ldiring!");
+            }
+        }
+
+        function showApp(user) {
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            document.getElementById('user-name-display').innerText = user.name + " " + user.surname;
+            document.getElementById('avatar').innerText = user.name[0];
+            renderCargos();
+        }
+
+        function addCargo() {
+            tg.HapticFeedback.impactOccurred('medium');
+            const desc = prompt("Yuk tavsifini yozing (Masalan: 20 tonna, Oq Spark):");
+            if (desc) {
+                const cargos = JSON.parse(localStorage.getItem('cargos') || '[]');
+                cargos.unshift({ id: Date.now(), desc, active: true });
+                localStorage.setItem('cargos', JSON.stringify(cargos));
+                renderCargos();
+            }
+        }
+
+        function renderCargos() {
+            const list = document.getElementById('list');
+            const cargos = JSON.parse(localStorage.getItem('cargos') || '[]');
+            list.innerHTML = cargos.map((c, i) => `
                 <div class="cargo-card">
-                    <div style="font-size: 12px; color: #8e8e93; margin-bottom: 8px;">
-                        <span class="status-dot ${c.active ? 'active-dot' : ''}"></span>
-                        ${c.active ? 'FAOL 24/7' : 'TO\'XTATILGAN'}
-                    </div>
-                    <div style="font-size: 17px; font-weight: 500;">${c.text}</div>
-                    <div style="font-size: 12px; margin-top: 5px; color: #8e8e93;">Interval: ${c.interval}s | Soni: ${c.count}</div>
-                    
-                    <div class="btn-group">
-                        <button class="btn ${c.active ? 'btn-outline' : 'btn-black'}" onclick="toggleStatus(${i})">
-                            ${c.active ? 'HIDE (TO\'XTATISH)' : 'SHOW (YOQISH)'}
-                        </button>
-                        <button class="btn btn-red" onclick="removeCargo(${i})">DELETE</button>
+                    <span class="status" style="color: ${c.active ? '#34c759' : '#ff9500'}">
+                        ● ${c.active ? '24/7 FAOL' : 'YASHIRILGAN'}
+                    </span>
+                    <div style="font-size: 17px; font-weight: 600; line-height: 1.4;">${c.desc}</div>
+                    <div class="card-actions">
+                        <button class="btn-sm btn-hide" onclick="toggle(${i})">${c.active ? 'HIDE' : 'SHOW'}</button>
+                        <button class="btn-sm btn-del" onclick="del(${i})">DELETE</button>
                     </div>
                 </div>
             `).join('');
-            localStorage.setItem('yusufxon_pro_cargos', JSON.stringify(cargos));
         }
 
-        function toggleStatus(i) {
-            tg.HapticFeedback.notificationOccurred('success');
+        function toggle(i) {
+            const cargos = JSON.parse(localStorage.getItem('cargos'));
             cargos[i].active = !cargos[i].active;
-            render();
+            localStorage.setItem('cargos', JSON.stringify(cargos));
+            tg.HapticFeedback.selectionChanged();
+            renderCargos();
         }
 
-        function removeCargo(i) {
-            tg.HapticFeedback.notificationOccurred('warning');
-            if(confirm("Haqiqatdan ham kanaldan o'chirmoqchimisiz?")) {
+        function del(i) {
+            if(confirm("Haqiqatdan ham o'chirmoqchimisiz?")) {
+                const cargos = JSON.parse(localStorage.getItem('cargos'));
                 cargos.splice(i, 1);
-                render();
+                localStorage.setItem('cargos', JSON.stringify(cargos));
+                tg.HapticFeedback.notificationOccurred('warning');
+                renderCargos();
             }
         }
-
-        // Yuk qo'shish funksiyasi
-        function openModal() {
-            const txt = prompt("Yuk tavsifini yozing:");
-            if(txt) {
-                cargos.unshift({
-                    text: txt,
-                    active: true,
-                    interval: 4,
-                    count: '24/7'
-                });
-                render();
-            }
-        }
-
-        render();
     </script>
 </body>
 </html>
