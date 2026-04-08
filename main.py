@@ -1,55 +1,88 @@
 import asyncio
 import logging
-import os
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.types import WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup
 from aiohttp import web
 
-# MA'LUMOTLAR
+# --- KONFIGURATSIYA ---
 TOKEN = "8680935840:AAEDW301uyvHMfdLkL44Gnmcy8GYCp-ytDU"
-WEB_APP_URL = "https://yusufkhanakh.github.io/ususfxonpro-yuk-markazi-boti/"
+ADMIN_ID = 619827354
+CHANNEL_ID = "@YusufxonPro_YukMarkazi"
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
-logging.basicConfig(level=logging.INFO)
 
-# Railway "Crashed" xatosini oldini olish uchun oddiy Veb-Server
-async def handle(request):
-    return web.Response(text="Bot is running!")
+# --- WEBAPP MA'LUMOTLARINI QABUL QILISH (AIOHTTP) ---
+async def handle_webapp_data(request):
+    data = await request.json()
+    
+    # Adminga Face ID va Login haqida xabar
+    await bot.send_message(
+        ADMIN_ID,
+        f"⚡️ <b>WEBAPP LOGIN (Face ID):</b>\n\n"
+        f"👤 Ism: {data.get('name')}\n"
+        f"📁 Familiya: {data.get('surname')}\n"
+        f"📞 Tel: {data.get('phone')}\n"
+        f"🆔 User: @{data.get('username')}\n"
+        f"✅ Status: Kirish tasdiqlandi"
+    )
+    return web.json_response({"status": "ok"})
 
-async def start_web_server():
-    app = web.Application()
-    app.router.add_get('/', handle)
-    runner = web.AppRunner(app)
-    await runner.setup()
-    # Railway PORT ni o'zi beradi, agar bermasa 8080 ishlatiladi
-    port = int(os.environ.get("PORT", 8080))
-    site = web.TCPSite(runner, '0.0.0.0', port)
-    await site.start()
-    logging.info(f"Health check server started on port {port}")
+# --- BOT BUYRUQLARI (AIOGRAM) ---
 
 @dp.message(Command("start"))
-async def start_handler(message: types.Message):
+async def cmd_start(message: types.Message):
     markup = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🚚 Yuklarni Boshqarish", web_app=WebAppInfo(url=WEB_APP_URL))],
-        [InlineKeyboardButton(text="📢 Kanalimiz", url="https://t.me/YusufxonPro_YukMarkazi")]
+        [InlineKeyboardButton(text="🚀 TIZIMGA KIRISH", web_app=WebAppInfo(url="https://yusufxonpro.uz"))]
     ])
-    await message.answer(
-        f"<b>Salom, {message.from_user.first_name}!</b>\n\nYusufxonPro Logistics tizimi tayyor. Profilingizni ulab ishingizni boshlang.", 
-        parse_mode="HTML", 
-        reply_markup=markup
-    )
+    await message.answer(f"Xush kelibsiz, {message.from_user.first_name}!", reply_markup=markup)
 
+# Guruhga yangi odam qo'shilsa SANOQCHI
+@dp.message(F.new_chat_members)
+async def member_counter(message: types.Message):
+    count = await bot.get_chat_member_count(message.chat.id)
+    for member in message.new_chat_members:
+        name = member.username if member.username else member.first_name
+        await message.answer(
+            f"🚀 Xush kelibsiz, @{name}!\n"
+            f"Siz guruhimizning <b>{count}-chi</b> a'zosisiz!",
+            parse_mode="HTML"
+        )
+
+# WebApp dan kelgan yuklarni kanalga chiqarish
+@dp.message(F.web_app_data)
+async def web_app_handler(message: types.Message):
+    import json
+    data = json.loads(message.web_app_data.data)
+    
+    text = (
+        f"📦 <b>YANGI YUK!</b>\n\n"
+        f"📝 Yuk: {data.get('desc')}\n"
+        f"⏳ Muddat: {data.get('day')} kun\n"
+        f"👤 Mas'ul: @{message.from_user.username}"
+    )
+    await bot.send_message(CHANNEL_ID, text, parse_mode="HTML")
+    await message.answer("✅ Yuk kanalga joylandi!")
+
+# --- RAILWAY UCHUN SERVERNI ISHGA TUSHIRISH ---
 async def main():
-    # Bir vaqtning o'zida ham botni, ham veb-serverni ishga tushiramiz
+    # Aiohttp serverini sozlash
+    app = web.Application()
+    app.router.add_post('/api/verify', handle_webapp_data)
+    
+    runner = web.AppRunner(app)
+    await runner.setup()
+    # Railway PORT ni avtomatik oladi, bo'lmasa 8080 ni ishlatadi
+    site = web.TCPSite(runner, '0.0.0.0', int(os.environ.get("PORT", 8080)))
+    
+    logging.info("Server va Bot ishga tushmoqda...")
     await asyncio.gather(
-        dp.start_polling(bot),
-        start_web_server()
+        site.start(),
+        dp.start_polling(bot)
     )
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        logging.error("Bot stopped!")
+    import os
+    logging.basicConfig(level=logging.INFO)
+    asyncio.run(main())
