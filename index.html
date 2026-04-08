@@ -8,57 +8,111 @@
     <style>
         :root { --bg: #ffffff; --input-bg: #f2f2f7; --text: #000000; --sub: #8e8e93; --border: #e5e5ea; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
+
+        /* Loader */
+        #sync-loader {
+            position: fixed; inset: 0; background: #fff; z-index: 3000;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #000; border-radius: 50%; animation: spin 1s infinite linear; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Banner */
         .banner {
-            width: 100%; height: 180px; background: #000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: #fff; text-align: center; border-radius: 0 0 30px 30px;
-            margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%; padding: 40px 20px; background: #000; color: #fff;
+            text-align: center; border-radius: 0 0 35px 35px; margin-bottom: 25px;
         }
-        .banner h1 { font-size: 26px; font-weight: 900; letter-spacing: 2px; }
-        .banner p { font-size: 12px; opacity: 0.7; margin-top: 5px; }
+        .banner h1 { font-size: 28px; font-weight: 900; letter-spacing: 2px; }
 
-        /* Login */
-        #login-section { padding: 0 30px; display: none; flex-direction: column; }
-        .input-box { margin-bottom: 15px; }
-        .input-box label { display: block; font-size: 11px; font-weight: 700; color: var(--sub); margin-bottom: 6px; }
+        /* Login Section */
+        #login-page { padding: 0 25px; display: none; flex-direction: column; gap: 15px; }
+        
+        /* Auto Profile Connect UI */
+        .auto-connect-card {
+            background: var(--input-bg); padding: 15px; border-radius: 20px;
+            display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+            border: 1px dashed #000;
+        }
+        .auto-connect-card img { width: 45px; height: 45px; border-radius: 50%; background: #ddd; }
+        .auto-connect-card div h5 { font-size: 14px; font-weight: 700; }
+        .auto-connect-card div p { font-size: 11px; color: #34c759; font-weight: 700; }
+
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group label { font-size: 11px; font-weight: 800; color: var(--sub); text-transform: uppercase; padding-left: 5px; }
         input {
             width: 100%; padding: 18px; background: var(--input-bg); border: 1px solid var(--border);
-            border-radius: 16px; font-size: 17px; outline: none; transition: 0.3s;
+            border-radius: 16px; font-size: 16px; outline: none;
         }
         input:focus { border-color: #000; background: #fff; }
 
-        /* Dashboard */
-        #main-app { display: none; }
-        .app-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .cargo-card { 
-            background: #fff; border: 1px solid var(--border); border-radius: 24px; padding: 20px; margin: 15px 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        .btn-connect {
+            width: 100%; padding: 20px; background: #000; color: #fff; border: none;
+            border-radius: 18px; font-weight: 800; font-size: 16px; margin-top: 10px;
         }
 
-        /* FAB */
-        .fab { position: fixed; bottom: 30px; right: 25px; width: 65px; height: 65px; background: #000; color: #fff; border-radius: 50%; border: none; font-size: 35px; z-index: 1000; }
+        /* Dashboard */
+        #app-layout { display: none; padding: 0 20px 100px; }
+        .user-header {
+            display: flex; align-items: center; gap: 15px; padding: 20px;
+            background: var(--input-bg); border-radius: 25px; margin-bottom: 25px;
+        }
+        .avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; }
+
+        .cargo-card {
+            background: #fff; border: 1px solid var(--border); border-radius: 25px;
+            padding: 22px; margin-bottom: 15px;
+        }
+        .btn-del { width: 100%; padding: 12px; border-radius: 12px; border: none; background: #fff0f0; color: #ff3b30; font-weight: 700; margin-top: 15px; }
+
+        .fab { position: fixed; bottom: 35px; right: 25px; width: 68px; height: 68px; background: #000; color: #fff; border-radius: 50%; border: none; font-size: 38px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
 
+    <div id="sync-loader">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; font-weight: 600;">SINXRONIZATSIYA...</p>
+    </div>
+
     <div class="banner">
-        <img src="https://i.postimg.cc/d1X5vYfK/M-LOGOG.png" style="width: 80px; margin-bottom: 10px;">
+        <img src="https://i.postimg.cc/d1X5vYfK/M-LOGOG.png" style="width: 85px; margin-bottom: 10px;">
         <h1>YUSUFXONPRO</h1>
-        <p>YusufxonPro Yuk Markazi | Yusufxonpro.uz</p>
     </div>
 
-    <div id="login-section">
-        <div class="input-box"><label>Ism</label><input type="text" id="reg-name" placeholder="Yusufxon"></div>
-        <div class="input-box"><label>Familiya</label><input type="text" id="reg-surname" placeholder="Axmatov"></div>
-        <div class="input-box"><label>Telefon (faqat raqam)</label><input type="tel" id="reg-phone" placeholder="+998 XX-XXX-XX-XX"></div>
-        <button onclick="saveUser()" style="width: 100%; padding: 20px; background: #000; color: #fff; border: none; border-radius: 18px; font-weight: 700; font-size: 16px; margin-top: 10px;">AKKAUNT OCHISH</button>
+    <div id="login-page">
+        <div class="auto-connect-card">
+            <img id="tg-preview-img" src="">
+            <div>
+                <h5 id="tg-preview-name">Telegram Profile</h5>
+                <p>● AVTOMATIK ANIQLANDI</p>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Ism</label>
+            <input type="text" id="name" placeholder="Yusufxon">
+        </div>
+        <div class="input-group">
+            <label>Familiya</label>
+            <input type="text" id="surname" placeholder="Axmatov">
+        </div>
+        <div class="input-group">
+            <label>Telefon</label>
+            <input type="tel" id="phone" placeholder="+998 XX-XXX-XX-XX">
+        </div>
+        <button class="btn-connect" onclick="startSync()">PROFILNI TASDIQLASH</button>
     </div>
 
-    <div id="main-app">
-        <div id="list"></div>
+    <div id="app-layout">
+        <div class="user-header">
+            <img id="user-img" src="" class="avatar">
+            <div>
+                <h4 id="user-full-name"></h4>
+                <p id="user-tag" style="font-size: 12px; color: #007aff;"></p>
+            </div>
+        </div>
+        <div id="cargo-list"></div>
         <button class="fab" onclick="addCargo()">+</button>
     </div>
 
@@ -66,67 +120,89 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Telefon raqami uchun faqat raqam va formatlash
-        const phoneInput = document.getElementById('reg-phone');
-        phoneInput.addEventListener('input', (e) => {
-            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,2})(\d{0,3})(\d{0,2})(\d{0,2})/);
-            if (!x[2]) e.target.value = x[1] ? '+998 ' : '';
-            else e.target.value = '+998 ' + x[2] + (x[3] ? '-' + x[3] : '') + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
+        // Telegramdan ma'lumotlarni olish
+        const tgData = tg.initDataUnsafe?.user || {};
+        const userPhoto = tgData.photo_url || "https://ui-avatars.com/api/?name=" + (tgData.first_name || "U");
+        const userTag = tgData.username ? "@" + tgData.username : "@username_yoq";
+
+        // Login sahifasida profilni ko'rsatish
+        document.getElementById('tg-preview-img').src = userPhoto;
+        document.getElementById('tg-preview-name').innerText = (tgData.first_name || "Foydalanuvchi") + " " + (tgData.last_name || "");
+
+        // Telefon raqam maskasi
+        document.getElementById('phone').addEventListener('input', (e) => {
+            let v = e.target.value.replace(/\D/g, '');
+            if (v.length > 12) v = v.substring(0, 12);
+            let r = "+998 ";
+            if (v.length > 3) {
+                let p = v.substring(3).match(/(\d{0,2})(\d{0,3})(\d{0,2})(\d{0,2})/);
+                r += p[1] + (p[2] ? "-" + p[2] : "") + (p[3] ? "-" + p[3] : "") + (p[4] ? "-" + p[4] : "");
+            }
+            e.target.value = r;
         });
 
-        function saveUser() {
-            const name = document.getElementById('reg-name').value;
-            const surname = document.getElementById('reg-surname').value;
-            const phone = document.getElementById('reg-phone').value;
+        function startSync() {
+            const n = document.getElementById('name').value;
+            const s = document.getElementById('surname').value;
+            const p = document.getElementById('phone').value;
 
-            if (name && surname && phone.length >= 17) {
-                localStorage.setItem('y_u', JSON.stringify({name, surname, phone}));
-                tg.HapticFeedback.notificationOccurred('success');
-                location.reload();
+            if (n && s && p.length >= 17) {
+                document.getElementById('sync-loader').style.display = 'flex';
+                setTimeout(() => {
+                    const profile = {
+                        fullName: n + " " + s,
+                        phone: p,
+                        username: userTag,
+                        photo: userPhoto
+                    };
+                    localStorage.setItem('y_pro_data', JSON.stringify(profile));
+                    tg.HapticFeedback.notificationOccurred('success');
+                    location.reload();
+                }, 2000);
             } else {
-                tg.showAlert("Iltimos, hamma qatorni to'g'ri to'ldiring!");
+                tg.showAlert("Iltimos, barcha maydonlarni to'ldiring!");
             }
         }
 
         window.onload = () => {
-            const user = JSON.parse(localStorage.getItem('y_u'));
-            if (user) {
-                document.getElementById('login-section').style.display = 'none';
-                document.getElementById('main-app').style.display = 'block';
+            const saved = JSON.parse(localStorage.getItem('y_pro_data'));
+            if (saved) {
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('app-layout').style.display = 'block';
+                document.getElementById('user-img').src = saved.photo;
+                document.getElementById('user-full-name').innerText = saved.fullName;
+                document.getElementById('user-tag').innerText = saved.username;
                 render();
             } else {
-                document.getElementById('login-section').style.display = 'flex';
+                document.getElementById('login-page').style.display = 'flex';
             }
         };
 
         function addCargo() {
-            const txt = prompt("Yuk tavsifini yozing (Masalan: Spark, Toshkent):");
+            const txt = prompt("Yuk tavsifini kiriting:");
             if (txt) {
-                const c = JSON.parse(localStorage.getItem('y_c') || '[]');
-                c.unshift({ id: Date.now(), txt, active: true });
-                localStorage.setItem('y_c', JSON.stringify(c));
+                const list = JSON.parse(localStorage.getItem('y_c_list') || '[]');
+                list.unshift({ id: Date.now(), txt });
+                localStorage.setItem('y_c_list', JSON.stringify(list));
                 render();
             }
         }
 
         function render() {
-            const list = document.getElementById('list');
-            const c = JSON.parse(localStorage.getItem('y_c') || '[]');
-            list.innerHTML = c.map((i, idx) => `
+            const list = JSON.parse(localStorage.getItem('y_c_list') || '[]');
+            document.getElementById('cargo-list').innerHTML = list.map((c, i) => `
                 <div class="cargo-card">
-                    <div style="font-size: 10px; font-weight: 800; color: #34c759; margin-bottom: 5px;">● 24/7 FAOL</div>
-                    <div style="font-size: 17px; font-weight: 600;">${i.txt}</div>
-                    <div style="display: flex; gap: 10px; margin-top: 15px;">
-                        <button onclick="del(${idx})" style="flex: 1; padding: 10px; border-radius: 10px; border: none; background: #fff0f0; color: #ff3b30; font-weight: 600;">O'CHIRISH</button>
-                    </div>
+                    <span style="font-size: 10px; font-weight: 800; color: #34c759;">● FAOL REJIM</span>
+                    <div style="font-size: 18px; font-weight: 700; margin-top: 8px;">${c.txt}</div>
+                    <button class="btn-del" onclick="del(${i})">O'CHIRISH</button>
                 </div>
             `).join('');
         }
 
-        function del(idx) {
-            const c = JSON.parse(localStorage.getItem('y_c'));
-            c.splice(idx, 1);
-            localStorage.setItem('y_c', JSON.stringify(c));
+        function del(i) {
+            const list = JSON.parse(localStorage.getItem('y_c_list'));
+            list.splice(i, 1);
+            localStorage.setItem('y_c_list', JSON.stringify(list));
             render();
         }
     </script>
