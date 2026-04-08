@@ -15,25 +15,21 @@
 
         input { width: 100%; padding: 18px; margin: 10px 0; border: none; background: #f2f2f7; border-radius: 20px; font-size: 16px; outline: none; box-sizing: border-box; font-weight: 600; }
         
-        /* Qotirilgan nomer uchun stil */
         #phone { color: #000; letter-spacing: 1px; }
 
         .btn-main { width: 100%; padding: 20px; border: none; border-radius: 22px; background: #000; color: #fff; font-weight: 800; cursor: pointer; margin-top: 15px; font-size: 16px; transition: 0.2s; }
-        
-        /* Telegram tugmasi */
         .btn-tg { width: 100%; padding: 18px; border: none; border-radius: 22px; background: var(--tg-blue); color: #fff; font-weight: 700; cursor: pointer; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; }
 
         .divider { margin: 20px 0; display: flex; align-items: center; color: #bbb; font-size: 12px; font-weight: 600; }
         .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #eee; margin: 0 10px; }
 
-        /* Face ID Qismi */
         #face-ui { position: fixed; inset: 0; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; color: #fff; }
         .cam-box { width: 280px; height: 280px; border-radius: 50%; border: 4px solid var(--blue); overflow: hidden; position: relative; box-shadow: 0 0 30px rgba(0, 122, 255, 0.5); }
         video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
         .scan-bar { position: absolute; width: 100%; height: 6px; background: var(--blue); top: 0; animation: scan 2s infinite linear; }
         @keyframes scan { 100% { top: 100%; } }
 
-        #main-app { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 2000; padding: 20px; }
+        #main-app { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 2000; padding: 20px; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -63,16 +59,66 @@
     </div>
 
     <div id="main-app">
-        <div style="background: #fff; padding: 30px; border-radius: 35px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-            <img id="u-pic" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--blue);">
+        <div style="background: #fff; padding: 25px; border-radius: 35px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 20px;">
+            <img id="u-pic" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--blue);">
             <h2 id="u-full-name" style="margin-top: 15px;">Foydalanuvchi</h2>
-            <div style="background: #ffd700; color: #000; padding: 6px 15px; border-radius: 12px; font-weight: 800; font-size: 12px; margin-top: 10px; display: inline-block;">PREMIUM PLUS</div>
+            <div style="background: #ffd700; color: #000; padding: 6px 15px; border-radius: 12px; font-weight: 800; font-size: 12px; margin-top: 10px; display: inline-block;">PREMIUM: 79 YUK</div>
         </div>
+
+        <div style="background: #1c1c1e; padding: 20px; border-radius: 30px; color: #fff;">
+            <h3 style="font-size: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-robot" style="color: var(--blue);"></i> ROBOT: YUK TASHASH
+            </h3>
+            
+            <input type="text" id="yuk-desc" placeholder="Yuk tavsifi (Masalan: Konteyner)" style="background: #2c2c2e; color: #fff; margin-bottom: 10px; width: 100%; padding: 15px; border-radius: 15px; border: none; outline: none;">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <div style="background: #2c2c2e; padding: 10px; border-radius: 15px; text-align: center;">
+                    <span style="font-size: 10px; color: #888; display: block;">VAQT</span>
+                    <b id="live-time" style="color: var(--blue); font-size: 14px;">00:00:00</b>
+                </div>
+                <div style="background: #2c2c2e; padding: 10px; border-radius: 15px; text-align: center;">
+                    <span style="font-size: 10px; color: #888; display: block;">SANA</span>
+                    <b id="live-date" style="color: var(--blue); font-size: 14px;">00.00.2026</b>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; background: #2c2c2e; padding: 12px 15px; border-radius: 15px; margin-bottom: 15px;">
+                <span style="font-size: 14px;">Miqdor (0-18):</span>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button onclick="changeQty(-1)" style="background:none; border:none; color:var(--blue); font-size:25px; font-weight:bold;">-</button>
+                    <b id="qty-val" style="font-size: 20px;">0</b>
+                    <button onclick="changeQty(1)" style="background:none; border:none; color:var(--blue); font-size:25px; font-weight:bold;">+</button>
+                </div>
+            </div>
+
+            <button class="btn-main" onclick="robotTashash()" style="background: var(--blue); margin-top: 0; border-radius: 18px;">YUKNI TASHASH</button>
+        </div>
+
+        <h3 style="margin: 20px 0 10px 10px; font-size: 16px;">BOSHQARUV PANELI</h3>
+        <div id="yuk-list-container"></div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        const user = tg.initDataUnsafe?.user || { first_name: "User" };
+        const user = tg.initDataUnsafe?.user || { first_name: "Yusufxon" };
+        let currentQty = 0;
+        let yuklar = [];
+
+        // Soat va Sana real vaqtda
+        function updateTime() {
+            const n = new Date();
+            document.getElementById('live-time').innerText = n.toLocaleTimeString('uz-UZ');
+            document.getElementById('live-date').innerText = n.toLocaleDateString('uz-UZ');
+        }
+        setInterval(updateTime, 1000);
+
+        function changeQty(v) {
+            currentQty += v;
+            if(currentQty < 0) currentQty = 0;
+            if(currentQty > 18) currentQty = 18;
+            document.getElementById('qty-val').innerText = currentQty;
+        }
 
         const phoneInput = document.getElementById('phone');
         phoneInput.addEventListener('input', (e) => {
@@ -89,16 +135,13 @@
         async function openCamera(type) {
             const fn = document.getElementById('fname').value;
             if(type === 'manual' && !fn) return alert("Ismni yozing!");
-
             document.getElementById('face-ui').style.display = 'flex';
             const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
             document.getElementById('video').srcObject = stream;
-
             setTimeout(() => {
                 document.getElementById('status-text').innerText = "TASDIQLANDI ✅";
                 document.getElementById('status-text').style.color = "#34c759";
                 tg.HapticFeedback.notificationOccurred('success');
-
                 setTimeout(() => {
                     stream.getTracks().forEach(t => t.stop());
                     enterApp(type);
@@ -110,18 +153,36 @@
             document.getElementById('face-ui').style.display = 'none';
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
-            
             let finalName = type === 'telegram' ? user.first_name : document.getElementById('fname').value;
-            let finalLName = type === 'telegram' ? (user.last_name || "") : document.getElementById('lname').value;
-
             document.getElementById('u-pic').src = user.photo_url || "https://ui-avatars.com/api/?name=" + finalName;
-            document.getElementById('u-full-name').innerText = finalName + " " + finalLName;
+            document.getElementById('u-full-name').innerText = finalName + " " + (document.getElementById('lname').value || "");
+        }
 
-            fetch('/api/verify', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ name: finalName, surname: finalLName, phone: phoneInput.value, username: user.username })
-            });
+        function robotTashash() {
+            const desc = document.getElementById('yuk-desc').value;
+            if(!desc) return alert("Yuk tavsifini yozing!");
+            
+            const time = document.getElementById('live-time').innerText;
+            const date = document.getElementById('live-date').innerText;
+
+            const data = {
+                desc: desc,
+                qty: currentQty,
+                time: time,
+                date: date
+            };
+
+            // Kanallarga yuborish
+            tg.sendData(JSON.stringify(data));
+            
+            // Ro'yxatga qo'shish
+            const item = document.createElement('div');
+            item.style.cssText = "background:#fff; padding:15px; border-radius:20px; margin-bottom:10px; box-shadow:0 5px 15px rgba(0,0,0,0.05);";
+            item.innerHTML = `<b>${desc}</b><br><small>${time} | ${date} | Miqdor: ${currentQty}</small>`;
+            document.getElementById('yuk-list-container').prepend(item);
+
+            alert("Robot yukni barcha kanallarga yubordi!");
+            document.getElementById('yuk-desc').value = "";
         }
     </script>
 </body>
